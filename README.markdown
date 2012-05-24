@@ -373,15 +373,15 @@ These examples may seem simple (`has_role('admin')` could just as easily be achi
 
 ### Getters & Setters ###
 
-Dakota supports [Eloquent](http://laravel.com/docs/database/eloquent#getter-and-setter-methods)-style custom getters & setters.  To define a getter, simply add a public function to your object that has `get_` prepended to it.
+Dakota supports [Eloquent](http://laravel.com/docs/database/eloquent#getter-and-setter-methods)-style custom getters & setters.  To define a getter, simply add a public function to your object that has `get_` prepended to it:
 
     public function get_name(){
         return $this->first_name . ' ' $this->last_name;
     }
 
-To access your getter, simply call it like a property.
+Your getter may now be accessed just like a property:
 
-    echo $this->name
+    echo $this->name;
 
 ### Transactions ###
 
