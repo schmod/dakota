@@ -11,6 +11,13 @@ Tested on PHP 5.2.0+ - may work on earlier versions with PDO and the correct dat
 
 Released under a [BSD license](http://en.wikipedia.org/wiki/BSD_licenses).
 
+What's New/Different
+----------
+* `find_many()` now returns an indexed array, using the table's primary key as the array key.
+* Supports custom getter methods, inspired by [Eloquent](http://laravel.com/docs/database/eloquent#getter-and-setter-methods)
+* Aliases may now be specified for column names.  Shouldn't be necessary in an ideal world, but we all have legacy code to maintain.
+
+
 Features
 --------
 
@@ -89,6 +96,16 @@ Dakota requires that your database tables have a unique primary key column. By d
     }
 
 **Note** - Dakota has its *own* default ID column name mechanism, and does not respect column names specified in Idiorm's configuration.
+
+### Column Aliases ###
+
+Sometimes database schemas change, but your code hasn't had time to catch up (or vice versa).  Rather than writing a big `SELECT AS` query, Dakota can establish aliases between column names in your database and properties in your model.  To use this feature, add a **public static** array to your class called `$_aliases`:
+    
+    class User extends Model {
+        public static $_aliases = array('alias' => 'db_column');
+    }
+
+From there, you can get and set both the 'alias' and 'db_column' property.  Changes made to one will be reflected in the other.
 
 ### Dakota's Active Record pattern ###
 
@@ -353,6 +370,18 @@ Here is an example utilizing a filter method with an argument.
     $guest_users = Model::factory('User')->has_role('guest')->find_many();
 
 These examples may seem simple (`has_role('admin')` could just as easily be achieved using `where('role', 'admin')`), but remember that filters can contain arbitrarily complex code - adding `raw_where` clauses or even complete `raw_query` calls to perform joins, etc. Filters provide a powerful mechanism to hide complexity in your model's query API.
+
+### Getters & Setters ###
+
+Dakota supports [Eloquent](http://laravel.com/docs/database/eloquent#getter-and-setter-methods)-style custom getters & setters.  To define a getter, simply add a public function to your object that has `get_` prepended to it.
+
+    public function get_name(){
+        return $this->first_name . ' ' $this->last_name;
+    }
+
+To access your getter, simply call it like a property.
+
+    echo $this->name
 
 ### Transactions ###
 
