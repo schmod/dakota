@@ -70,6 +70,13 @@
         }
 
         /**
+         * Array definining column aliases.  Good for backward compatibility.
+         * array( $column_name => $alias)
+         */
+
+        public static $_aliases = array();
+
+        /**
          * Set the name of the class which the wrapped
          * methods should return instances of.
          */
@@ -136,10 +143,11 @@
          */
         public function find_many() {
             $rows = $this->_run();
+            $id_column= $this->_instance_id_column;
             $instances = array();
             foreach ($rows as $row) {
-                $instances[] = $this->_for_table($this->_table_name)
-                  ->use_id_column($this->_instance_id_column)
+                $instances[$row[$id_column]] = $this->_for_table($this->_table_name)
+                  ->use_id_column($id_column)
                   ->hydrate($row)
                   ->not_new();
             }
@@ -228,6 +236,15 @@
          */
         protected static function _id_column_name($class_name) {
             return self::_get_static_property($class_name, '_id_column', self::DEFAULT_ID_COLUMN);
+        }
+
+        /**
+         * Get the column name, reverting to alias if specified
+         */
+        public static $_aliases = array();
+        protected static function _get_column_name($class_name,$key){
+            $_aliases = self::_get_static_property($class_name,'_aliases');
+            return array_key_exists($key, $_aliases) ? $_aliases[$key] : $key;
         }
 
         /**
@@ -327,5 +344,29 @@
                 ->join($join_table_name, array("{$associated_table_name}.{$associated_table_id_column}", '=', "{$join_table_name}.{$key_to_associated_table}"))
                 ->where("{$join_table_name}.{$key_to_base_table}", $this->id());
         }
+
+        //Support custom getters
+        public function __get($key){
+            $key = self::_get_column_name(get_class($this),$key);
+            if (parent::__isset($key)){
+                return parent::get($key);
+            }
+            elseif(method_exists($this,"get_" . $key)){
+                $func = "get_" . $key;
+                return $this->$func();
+            }
+        }
+
+        //Override Idiorm's isset function to also acknowledge existence of custom getters
+        public function __isset($key) {
+            return parent::__isset(self::_get_column_name(get_class($this),$key)) || method_exists($this,"get_" . $key);
+        }
+
+        //Serializes object to JSON
+        public function JsonSerialize(){
+            echo json_encode($this->_data);
+        }
+
+
         
     }
