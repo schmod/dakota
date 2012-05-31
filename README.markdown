@@ -7,7 +7,7 @@ A lightweight Active Record implementation for PHP5.
 Built on top of [Idiorm](http://github.com/j4mie/idiorm/).
 Forked from [Paris](http://github.com/j4mie/paris/).
 
-Tested on PHP 5.2.0+ - may work on earlier versions with PDO and the correct database drivers.
+Tested on PHP 5.4.0+ - Will work on earlier versions without JSON Serialization.
 
 Released under a [BSD license](http://en.wikipedia.org/wiki/BSD_licenses).
 
@@ -16,6 +16,7 @@ What's New/Different
 * `find_many()` now returns an indexed array, using the table's primary key as the array key.
 * Supports custom getter methods, inspired by [Eloquent](http://laravel.com/docs/database/eloquent#getter-and-setter-methods)
 * Aliases may now be specified for column names.  Shouldn't be necessary in an ideal world, but we all have legacy code to maintain.
+* Implements `JsonSerializable`, allowing us to use `json_encode` on our model objects.
 
 
 Features

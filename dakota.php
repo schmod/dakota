@@ -173,7 +173,7 @@
      * }
      *
      */
-    class Model extends ORMWrapper {
+    class Model extends ORMWrapper implements JsonSerializable{
 
         // Default ID column for all models. Can be overridden by adding
         // a public static _id_column property to your model classes.
@@ -363,8 +363,8 @@
         }
 
         //Serializes object to JSON
-        public function JsonSerialize(){
-            echo json_encode($this->_data);
+        public function jsonSerialize(){
+            return json_encode($this->_data);
         }
 
 
