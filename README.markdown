@@ -11,11 +11,11 @@ Tested on PHP 5.4.0+ - Will work on earlier versions without JSON Serialization.
 
 Released under a [BSD license](http://en.wikipedia.org/wiki/BSD_licenses).
 
-What's New/Different
+What's different in this fork
 ----------
 * `find_many()` now returns an indexed array, using the table's primary key as the array key.
-* Supports custom getter methods, inspired by [Eloquent](http://laravel.com/docs/database/eloquent#getter-and-setter-methods)
-* Aliases may now be specified for column names.  Shouldn't be necessary in an ideal world, but we all have legacy code to maintain.
+* Supports [custom getter methods](#getters--setters), inspired by [Eloquent](http://laravel.com/docs/database/eloquent#getter-and-setter-methods)
+* [Aliases](#column-aliases) may now be specified for column names.  Shouldn't be necessary in an ideal world, but we all have legacy code to maintain.
 * Implements `JsonSerializable`, allowing us to use `json_encode` on our model objects.
 
 
@@ -206,15 +206,15 @@ The following list summarises the associations provided by Dakota, and explains 
 
 ##### One-to-one #####
 
-Use `has_one` in the base, and `belongs_to` in the associated model.
+Use [`has_one`](#has-one) in the base, and [`belongs_to`](#belongs-to) in the associated model.
 
 ##### One-to-many #####
 
-Use `has_many` in the base, and `belongs_to` in the associated model.
+Use [`has_many`](#has-many) in the base, and [`belongs_to`](#belongs-to) in the associated model.
 
 ##### Many-to-many #####
 
-Use `has_many_through` in both the base and associated models.
+Use [`has_many_through`](#has-many-through) in both the base and associated models.
 
 Below, each association helper method is discussed in detail.
 
