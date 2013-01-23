@@ -271,13 +271,19 @@
             return new $class_name;
         }
 
+        protected $_relationships;
+
         /**
          * Internal method to construct the queries for both the has_one and
          * has_many methods. These two types of association are identical; the
          * only difference is whether find_one or find_many is used to complete
          * the method chain.
          */
-        protected function _has_one_or_many($associated_class_name, $foreign_key_name=null) {
+        protected function _has_one_or_many($associated_class_name, $foreign_key_name=null,$relation) {
+            $relationship = debug_backtrace()[2]['function'];
+            $this->_relationships[$relationship]['type'] = $relation;
+            $this->_relationships[$relationship]['hydrated'] = false;
+
             $base_table_name = self::_get_table_name(get_class($this));
             $foreign_key_name = self::_build_foreign_key_name($foreign_key_name, $base_table_name);
             return self::factory($associated_class_name)->where($foreign_key_name, $this->id());
@@ -288,7 +294,7 @@
          * key is on the associated table.
          */
         protected function has_one($associated_class_name, $foreign_key_name=null) {
-            return $this->_has_one_or_many($associated_class_name, $foreign_key_name);
+            return $this->_has_one_or_many($associated_class_name, $foreign_key_name,__FUNCTION__);
         }
 
         /**
@@ -296,7 +302,7 @@
          * key is on the associated table.
          */
         protected function has_many($associated_class_name, $foreign_key_name=null) {
-            return $this->_has_one_or_many($associated_class_name, $foreign_key_name);
+            return $this->_has_one_or_many($associated_class_name, $foreign_key_name,__FUNCTION__);
         }
 
         /**
@@ -357,14 +363,30 @@
             }
         }
 
+        public function __set($key, $value) {
+            $this->set(self::_get_column_name(get_class($this),$key), $value);
+        }
+
         //Override Idiorm's isset function to also acknowledge existence of custom getters
         public function __isset($key) {
             return parent::__isset(self::_get_column_name(get_class($this),$key)) || method_exists($this,"get_" . $key);
         }
 
+        /**
+         * Hydrate the object from an array, and mark everything as dirty (so we can save it)
+         */
+        public function dirty_hydrate($data=array()){
+            foreach ($this->_data as $key=>$value){
+                if(isset($_POST[$key]) && $_POST[$key] != self::_get_column_name(get_class($this),$key)){
+                    $this->set($key,$_POST[$key]);
+                }
+            }
+            return $this;
+        }
+
         //Serializes object to JSON
         public function jsonSerialize(){
-            return json_encode($this->_data);
+            return $this->_data;
         }
 
 
